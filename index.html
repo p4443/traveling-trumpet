@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>旅するトランペット チラシ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Yomogi&display=swap" rel="stylesheet">
+  <style>
+    @page a5 {
+      size: A5 landscape;
+      margin: 0;
+    }
+    @page a4 {
+      size: A4 portrait;
+      margin: 0;
+    }
+    @page instagram {
+      size: 1080px 1080px;
+      margin: 0;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yomogi", sans-serif;
+      color: #2b2b2b;
+      background-color: #fbf1da;
+      /* ノート風の横罫線 */
+      background-image: repeating-linear-gradient(
+        to bottom,
+        #fbf1da 0,
+        #fbf1da 27px,
+        #d9cdb2 28px,
+        #fbf1da 29px
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .format-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .format-controls select {
+      padding: 6px 10px;
+      font: inherit;
+    }
+    .action-button {
+      min-height: 36px;
+      border: 2px solid #2b2b2b;
+      border-radius: 18px;
+      padding: 6px 16px;
+      font: inherit;
+      font-weight: bold;
+      color: #2b2b2b;
+      background: #f5c343;
+      box-shadow: 2px 2px 0 #2b2b2b;
+      cursor: pointer;
+    }
+    .action-button:hover {
+      background: #ffd66d;
+    }
+    .action-button:active {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+    .action-button:focus-visible {
+      outline: 3px solid #d9822b;
+      outline-offset: 2px;
+    }
+    .save-button {
+      color: #fdf6e6;
+      background: #2b2b2b;
+    }
+    .save-button:hover {
+      background: #4b4b4b;
+    }
+    .action-status {
+      max-width: 260px;
+      color: #555;
+      font-size: 12px;
+    }
+
+    @media screen and (max-width: 760px) {
+      .format-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .action-status {
+        flex-basis: 100%;
+        max-width: none;
+        text-align: center;
+      }
+    }
+
+    /* チラシの本体枠（ノートに貼られたカード風） */
+    .flyer {
+      page: a5;
+      width: 210mm;
+      height: 148mm;
+      background-color: #fdf6e6;
+      border: 3px solid #2b2b2b;
+      border-radius: 8px;
+      box-sizing: border-box;
+      padding: 8mm 12mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 4px 6px 0 rgba(43, 43, 43, 0.15);
+    }
+
+    .flyer > * {
+      position: relative;
+      z-index: 1;
+    }
+    .flyer > .header,
+    .flyer > .welcome-banner,
+    .flyer > .content,
+    .flyer > .footer {
+      zoom: var(--flyer-fit-scale, 1);
+    }
+
+    /* 隅の落書き音符・楽器イラスト */
+    .doodle {
+      position: absolute;
+      font-size: 40px;
+      color: #2b2b2b;
+      z-index: 0;
+      user-select: none;
+      pointer-events: none;
+    }
+    .doodle-note1 { bottom: 4mm; right: 9mm; transform: rotate(10deg); }
+    .doodle-note2 { bottom: 6mm; left: 10mm; transform: rotate(-10deg); }
+    .doodle-note3 { bottom: 30mm; right: 22mm; font-size: 30px; transform: rotate(-8deg); }
+    .doodle-note4 { bottom: 30mm; right: 8mm; font-size: 30px; transform: rotate(12deg); }
+    .doodle-svg {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      filter: drop-shadow(2px 3px 2px rgba(43,43,43,0.25));
+    }
+    .doodle-piano {
+      top: 10mm;
+      left: 13mm;
+      width: 18mm;
+      transform: rotate(-10deg);
+    }
+    .doodle-trumpet {
+      top: 11mm;
+      right: 12mm;
+      width: 22mm;
+      transform: rotate(8deg);
+    }
+
+    /* ヘッダー */
+    .header {
+      text-align: center;
+      padding-bottom: 6px;
+    }
+    .catch {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #fdf6e6;
+      background: #2b2b2b;
+      padding: 3px 14px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+    }
+    .title {
+      font-family: "Kalam", "Yomogi", sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin: 0;
+      color: #2b2b2b;
+    }
+
+    /* 参加ハードルを下げる訴求バナー */
+    .welcome-banner {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0;
+    }
+    .welcome-banner span {
+      background: #f5c343;
+      color: #2b2b2b;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 2px solid #2b2b2b;
+      white-space: nowrap;
+    }
+
+    /* メインコンテンツ */
+    .content {
+      display: grid;
+      grid-template-columns: 0.75fr 1.6fr 1.2fr;
+      gap: 12px;
+      align-items: center;
+      margin: 8px 0;
+      text-align: center;
+    }
+    .content > * {
+      min-width: 0;
+    }
+    .performer {
+      background: #fdf6e6;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 0;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      justify-self: center;
+      gap: 6px;
+      text-align: center;
+      border: 3px solid #2b2b2b;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .performer-label {
+      font-size: 12px;
+      color: #6b6b6b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .performer-note {
+      font-size: 13px;
+      color: #555;
+      white-space: normal;
+    }
+
+    /* 開催情報 */
+    .info-group {
+      text-align: left;
+      margin: 0 auto;
+      max-width: none;
+      width: 100%;
+      background: #fdf6e6;
+      border: 3px solid #2b2b2b;
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #2b2b2b;
+    }
+    .info-item {
+      display: flex;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .info-label {
+      width: 48px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      font-weight: bold;
+      color: #d9822b;
+    }
+    .info-value {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .event-date {
+      white-space: normal;
+      font-size: 15px;
+      color: #2b2b2b;
+    }
+    .event-note-main {
+      display: inline-block;
+      font-size: 15px;
+      font-weight: bold;
+      color: #2b2b2b;
+      margin-bottom: 4px;
+    }
+    .event-note {
+      display: inline-block;
+      color: #2b2b2b;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* 地図・QRコードエリア */
+    .map-section {
+      text-align: center;
+      margin-top: 0;
+      padding: 8px;
+      border: 3px dashed #2b2b2b;
+      border-radius: 12px;
+      background: #fdf6e6;
+    }
+    .date-write-in {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      margin-bottom: 8px;
+      padding: 4px 8px;
+      border: 2px solid #2b2b2b;
+      border-radius: 6px;
+      background: #fffdf7;
+      text-align: left;
+    }
+    .date-write-in-label {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .date-write-in-space {
+      flex: 1;
+      align-self: stretch;
+      min-width: 0;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 18px;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
+    .editable-setlist {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .map-link {
+      word-break: break-all;
+      font-size: 13px;
+      font-weight: bold;
+      color: #d9822b;
+    }
+
+    /* フッター */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #2b2b2b;
+      border-top: 3px solid #2b2b2b;
+      padding-top: 10px;
+    }
+    .footer a {
+      color: #d9822b;
+    }
+
+    body[data-size="a4"] .flyer {
+      page: a4;
+      width: 210mm;
+      height: 297mm;
+      padding: 12mm 16mm;
+      justify-content: flex-start;
+    }
+    body[data-size="a4"] .welcome-banner {
+      margin-top: 6px;
+    }
+    body[data-size="a4"] .content {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: stretch;
+      flex: 1;
+      margin: 18px 0 12px;
+    }
+    body[data-size="a4"] .performer {
+      width: 100%;
+    }
+    body[data-size="a4"] .info-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    body[data-size="a4"] .info-item {
+      margin-bottom: 0;
+      align-items: flex-start;
+      font-size: 22px;
+    }
+    body[data-size="a4"] .event-note-main,
+    body[data-size="a4"] .event-date,
+    body[data-size="a4"] .event-note,
+    body[data-size="a4"] .editable-setlist {
+      font-size: 22px;
+    }
+    body[data-size="a4"] .event-note {
+      white-space: nowrap;
+    }
+    body[data-size="a4"] .event-note br {
+      display: none;
+    }
+    body[data-size="a4"] .map-section {
+      padding: 12px;
+    }
+    body[data-size="a4"] .date-write-in {
+      min-height: 48px;
+      margin-bottom: 12px;
+    }
+    body[data-size="a4"] .date-write-in-label {
+      font-size: 15px;
+    }
+    body[data-size="a4"] .footer {
+      font-size: 14px;
+    }
+    body[data-size="a4"] .doodle-note3,
+    body[data-size="a4"] .doodle-note4 {
+      display: none;
+    }
+
+    body[data-size="instagram"] .flyer {
+      page: instagram;
+      width: 1080px;
+      height: 1080px;
+      padding: 58px 72px;
+      border-width: 10px;
+      border-radius: 28px;
+    }
+    body[data-size="instagram"] .catch {
+      font-size: 26px;
+      padding: 8px 28px;
+      border-radius: 28px;
+      margin-bottom: 16px;
+    }
+    body[data-size="instagram"] .title {
+      font-size: 72px;
+    }
+    body[data-size="instagram"] .welcome-banner {
+      gap: 12px;
+      margin: 12px 0;
+    }
+    body[data-size="instagram"] .welcome-banner span {
+      font-size: 24px;
+      padding: 8px 20px;
+      border-width: 3px;
+    }
+    body[data-size="instagram"] .content {
+      grid-template-columns: 0.45fr 1.55fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    body[data-size="instagram"] .map-section {
+      grid-column: 1 / -1;
+    }
+    body[data-size="instagram"] .performer {
+      width: 100%;
+      padding: 16px;
+      gap: 8px;
+      border-width: 4px;
+    }
+    body[data-size="instagram"] .performer-label,
+    body[data-size="instagram"] .performer-note {
+      font-size: 22px;
+    }
+    body[data-size="instagram"] .info-group {
+      padding: 12px 18px;
+      border-width: 4px;
+    }
+    body[data-size="instagram"] .info-item {
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+    body[data-size="instagram"] .info-label {
+      width: 76px;
+    }
+    body[data-size="instagram"] .event-note-main,
+    body[data-size="instagram"] .event-date {
+      font-size: 20px;
+    }
+    body[data-size="instagram"] .event-note {
+      font-size: 16px;
+    }
+    body[data-size="instagram"] .editable-setlist {
+      font-size: 22px;
+    }
+    body[data-size="instagram"] .map-section {
+      padding: 10px;
+      border-width: 4px;
+    }
+    body[data-size="instagram"] .date-write-in {
+      min-height: 48px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-width: 3px;
+    }
+    body[data-size="instagram"] .date-write-in-label {
+      font-size: 18px;
+    }
+    body[data-size="instagram"] .map-section > div:not(.date-write-in) {
+      font-size: 18px !important;
+      margin: 5px 0 !important;
+    }
+    body[data-size="instagram"] .map-link {
+      font-size: 18px !important;
+    }
+    body[data-size="instagram"] .footer {
+      font-size: 18px;
+      padding-top: 10px;
+      border-top-width: 4px;
+    }
+    body[data-size="instagram"] .doodle {
+      font-size: 64px;
+    }
+    body[data-size="instagram"] .doodle-note3,
+    body[data-size="instagram"] .doodle-note4 {
+      font-size: 48px;
+    }
+    body[data-size="instagram"] .doodle-piano {
+      width: 36mm;
+    }
+    body[data-size="instagram"] .doodle-trumpet {
+      width: 44mm;
+    }
+
+    @media screen and (max-width: 1112px) {
+      body[data-size="instagram"] {
+        align-items: flex-start;
+      }
+    }
+
+    /* 印刷時の不要な余白消去 */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+      .flyer {
+        box-shadow: none;
+      }
+      .format-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="format-controls">
+    <label for="format-select">サイズ</label>
+    <select id="format-select">
+      <option value="a5">A5 横</option>
+      <option value="a4">A4 縦</option>
+      <option value="instagram">Instagram 正方形（1080 × 1080 px）</option>
+    </select>
+    <button class="action-button" id="print-button" type="button">印刷</button>
+    <button class="action-button save-button" id="save-button" type="button">PDFで保存</button>
+    <span class="action-status" id="action-status" aria-live="polite">印刷・保存時も選択したサイズが使われます</span>
+  </div>
+
+  <div class="flyer">
+    <img class="doodle-svg doodle-piano" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3b9.svg" alt="">
+    <img class="doodle-svg doodle-trumpet" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ba.svg" alt="">
+    <span class="doodle doodle-note1">♪</span>
+    <span class="doodle doodle-note2">♫</span>
+    <span class="doodle doodle-note3">♪</span>
+    <span class="doodle doodle-note4">♫</span>
+
+    <div class="header">
+      <div class="catch">心揺さぶる音色とともに</div>
+      <h1 class="title">旅するトランペット</h1>
+    </div>
+
+    <div class="welcome-banner">
+      <span>どなたでもお気軽に</span>
+      <span>出入り自由</span>
+      <span>無料</span>
+      <span>トランペットに興味のある方</span>
+    </div>
+
+    <div class="content">
+      <div class="performer">
+        <div class="performer-label">Trumpet Solo</div>
+        <div class="performer-note">BGMとして演奏いたします</div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-item">
+          <span class="info-label">日時</span>
+          <span class="info-value">
+            <span class="event-note-main">※金曜日に不定期開催<br>（次回日程は別途ご案内）</span><br>
+            <strong>16:30 スタート</strong><br>
+            <small class="event-note">※状況によっては時間がずれる<br>こともございます。</small>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">会場</span>
+          <span class="info-value">熊谷駅直結　ティアラ21　3階　アズイースト<br>Cara Musica &amp; cafe（カーラ ムジカ＆カフェ）</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">曲目</span>
+          <span class="info-value"><textarea class="editable-setlist" rows="1" aria-label="曲目を入力"></textarea></span>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <div class="date-write-in">
+          <span class="date-write-in-label">開催日</span>
+          <textarea class="date-write-in-space" rows="1" aria-label="開催日を入力、または印刷後に手書き"></textarea>
+        </div>
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">【会場アクセス】</div>
+        <a class="map-link" href="https://maps.app.goo.gl/am5jjHXNNBYPkZzt5?g_st=ic" target="_blank">
+          Googleマップで会場を見る
+        </a>
+        <div style="font-size: 12px; font-weight: bold; margin: 10px 0 5px;">【食べログ】</div>
+        <a class="map-link" href="https://tabelog.com/saitama/A1105/A110501/11066730/" target="_blank">
+          食べログで店舗情報を見る
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      お問い合わせ<br>
+      <a href="https://namegawa-brass-lab.com/" target="_blank">https://namegawa-brass-lab.com/</a><br>
+      <a href="tel:09057690830">電話：090-5769-0830</a><br>
+      <a href="mailto:zuomuj924@gmail.com">メール：zuomuj924@gmail.com</a>
+    </div>
+  </div>
+
+  <script>
+    const formatSelect = document.getElementById("format-select");
+    const printButton = document.getElementById("print-button");
+    const saveButton = document.getElementById("save-button");
+    const actionStatus = document.getElementById("action-status");
+    const flyer = document.querySelector(".flyer");
+    const editableFields = flyer.querySelectorAll(".date-write-in-space, .editable-setlist");
+    const fitElements = flyer.querySelectorAll(":scope > .header, :scope > .welcome-banner, :scope > .content, :scope > .footer");
+
+    function resizeField(field) {
+      field.style.height = "auto";
+      field.style.height = `${field.scrollHeight}px`;
+    }
+
+    function fitFlyer() {
+      flyer.style.setProperty("--flyer-fit-scale", "1");
+      const bounds = flyer.getBoundingClientRect();
+      const inset = flyer.clientTop;
+      const available = {
+        top: bounds.top + inset,
+        right: bounds.left + flyer.clientLeft + flyer.clientWidth,
+        bottom: bounds.top + inset + flyer.clientHeight,
+        left: bounds.left + flyer.clientLeft
+      };
+      const fits = () => [...fitElements].every((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.top >= available.top - 1
+          && rect.right <= available.right + 1
+          && rect.bottom <= available.bottom + 1
+          && rect.left >= available.left - 1;
+      });
+
+      for (let scale = 1; scale >= 0.5; scale -= 0.02) {
+        flyer.style.setProperty("--flyer-fit-scale", scale.toFixed(2));
+        if (fits()) {
+          return;
+        }
+      }
+    }
+
+    function updateFlyerLayout() {
+      editableFields.forEach(resizeField);
+      fitFlyer();
+    }
+
+    function openPrintDialog(saveAsPdf = false) {
+      actionStatus.textContent = saveAsPdf
+        ? "印刷画面の「送信先」または「プリンタ」で「PDFに保存」を選んでください"
+        : "印刷画面を開いています";
+      updateFlyerLayout();
+      requestAnimationFrame(() => window.print());
+    }
+
+    formatSelect.addEventListener("change", () => {
+      document.body.dataset.size = formatSelect.value;
+      updateFlyerLayout();
+    });
+    printButton.addEventListener("click", () => openPrintDialog());
+    saveButton.addEventListener("click", () => openPrintDialog(true));
+    window.addEventListener("afterprint", () => {
+      actionStatus.textContent = "印刷・保存時も選択したサイズが使われます";
+    });
+    editableFields.forEach((field) => field.addEventListener("input", updateFlyerLayout));
+    window.addEventListener("resize", updateFlyerLayout);
+    document.fonts.ready.then(updateFlyerLayout);
+    updateFlyerLayout();
+  </script>
+</body>
+</html>
