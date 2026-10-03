@@ -545,15 +545,27 @@
 
     /* 印刷時の不要な余白消去 */
     @media print {
+      html,
       body {
+        width: auto;
+        height: auto;
+        min-height: 0;
+        margin: 0;
         background: none;
         padding: 0;
+        display: block;
+        overflow: hidden;
       }
       .flyer {
+        margin: 0;
         box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
       }
       .format-controls {
-        display: none;
+        display: none !important;
       }
     }
   </style>
@@ -691,7 +703,7 @@
         ? "印刷画面の「送信先」または「プリンタ」で「PDFに保存」を選んでください"
         : "印刷画面を開いています";
       updateFlyerLayout();
-      requestAnimationFrame(() => window.print());
+      window.print();
     }
 
     formatSelect.addEventListener("change", () => {
@@ -700,6 +712,7 @@
     });
     printButton.addEventListener("click", () => openPrintDialog());
     saveButton.addEventListener("click", () => openPrintDialog(true));
+    window.addEventListener("beforeprint", updateFlyerLayout);
     window.addEventListener("afterprint", () => {
       actionStatus.textContent = "印刷・保存時も選択したサイズが使われます";
     });
